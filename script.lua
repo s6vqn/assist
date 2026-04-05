@@ -7,8 +7,8 @@ local Camera = workspace.CurrentCamera
 
 local ToggleEnabled = false
 local RightClickHeld = false
-local Smoothness = 0.15
-local FOV = 15
+local Smoothness = 0.25
+local FOV = 20
 
 -- T Key Toggle
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
@@ -32,21 +32,30 @@ UserInputService.InputEnded:Connect(function(input, gameProcessed)
 end)
 
 -- Wall Check
-local function hasLineOfSight(targetPosition)
+local function canSeeTarget(targetPos)
     local origin = Camera.CFrame.Position
-    local ray = Ray.new(origin, (targetPosition - origin).Unit * 1000)
-    local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, {LocalPlayer.Character}, false, true)
+    local direction = (targetPos - origin).Unit * 1000
+    local ray = Ray.new(origin, direction)
+    local hit = workspace:FindPartOnRayWithIgnoreList(ray, {LocalPlayer.Character}, true, false)
     
     if hit then
-        local distToHit = (pos - origin).Magnitude
-        local distToTarget = (targetPosition - origin).Magnitude
-        return distToHit >= distToTarget
+        -- Check if hit is the target
+        local hitModel = hit.Parent
+        for i = 1, 5 do
+            if hitModel and hitModel:FindFirstChildOfClass("Humanoid") then
+                return true
+            end
+            if hitModel then
+                hitModel = hitModel.Parent
+            end
+        end
+        return false
     end
     
     return true
 end
 
--- Get whatever part player is aiming at
+-- Get any part
 local function getAimedPart()
     local target = Mouse.Target
     
@@ -64,7 +73,7 @@ local function getAimedPart()
     return nil
 end
 
--- Find closest player with aimed part
+-- Find closest
 local function getClosestTarget()
     local closestTarget = nil
     local shortestDistance = math.huge
@@ -78,8 +87,8 @@ local function getClosestTarget()
                 if aimedPart and aimedPart:IsDescendantOf(character) then
                     local targetPos = aimedPart.Position
                     
-                    -- Wall check
-                    if not hasLineOfSight(targetPos) then
+                    -- Wall check - only aim if can see target
+                    if not canSeeTarget(targetPos) then
                         continue
                     end
                     
@@ -104,7 +113,7 @@ local function getClosestTarget()
     return closestTarget
 end
 
--- Soft Aimbot
+-- Aimbot
 local function aimAtTarget()
     local targetPos = getClosestTarget()
     if targetPos then
@@ -113,14 +122,14 @@ local function aimAtTarget()
     end
 end
 
--- Run Aimbot
+-- Run
 RunService.RenderStepped:Connect(function()
     if ToggleEnabled and RightClickHeld then
         aimAtTarget()
     end
 end)
 
-print("Soft Aimbot Loaded!")
+print("Aimbot Loaded!")
 print("Press T to toggle")
 print("Hold RIGHT CLICK to aim")
-print("- Wall check added")
+print("- Wall check added (won't aim through walls)")
