@@ -1,25 +1,10 @@
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local Camera = workspace.CurrentCamera
 
-local RightClickHeld = false
 local Smoothness = 0.08
-
--- Right Click Detection
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if input.UserInputType == Enum.UserInputType.MouseButton2 then
-        RightClickHeld = true
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input, gameProcessed)
-    if input.UserInputType == Enum.UserInputType.MouseButton2 then
-        RightClickHeld = false
-    end
-end)
 
 -- Get target part
 local function getTargetPart()
@@ -76,22 +61,20 @@ local function getClosestEnemy()
     return closestTarget
 end
 
--- Soft Aim Assist (Always ON)
+-- Soft Aim Assist (ALWAYS ON)
 RunService.RenderStepped:Connect(function()
-    if RightClickHeld then
-        local targetPos = getClosestEnemy()
-        if targetPos then
-            local TargetCF = CFrame.new(Camera.CFrame.Position, targetPos)
-            Camera.CFrame = Camera.CFrame:Lerp(TargetCF, Smoothness)
-        end
+    local targetPos = getClosestEnemy()
+    if targetPos then
+        local TargetCF = CFrame.new(Camera.CFrame.Position, targetPos)
+        Camera.CFrame = Camera.CFrame:Lerp(TargetCF, Smoothness)
     end
 end)
 
 print("=================================")
-print("Soft Aim Assist Loaded!")
-print("Hold RIGHT CLICK when scoped")
-print("- Smooth follow (0.08)")
+print("Soft Aim Assist - ALWAYS ON")
+print("Just play normally!")
+print("- Smooth follow")
 print("- Targets Torso/Head")
 print("- No teammates")
-print("- ALWAYS ON")
+print("- NO TOGGLE, NO HOLD")
 print("=================================")
