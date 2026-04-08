@@ -1,3 +1,3 @@
 ```Lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/s6vqn/AimbotXNatoy/main/script.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/s6vqn/assist/main/script.lua"))()
 ```
